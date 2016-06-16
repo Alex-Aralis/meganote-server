@@ -1,0 +1,24 @@
+{
+  "name": "meganote-server",
+  "version": "0.0.0",
+  "description": "REST note taking API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Alex-Aralis/meganote-server.git"
+  },
+  "keywords": [
+    "REST",
+    "API",
+    "server"
+  ],
+  "author": "Alex Aralis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Alex-Aralis/meganote-server/issues"
+  },
+  "homepage": "https://github.com/Alex-Aralis/meganote-server#readme"
+}
