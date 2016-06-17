@@ -2,8 +2,10 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var db = require('./config/db');
 var app = express();
+var sanitizeHtml = require('sanitize-html');
+var htmlToText = require('html-to-text');
 
-var port = Number(process.argv[1]) || 8080;
+var port = Number(process.env.PORT) || 8080;
 
 console.log(port);
 
@@ -12,6 +14,16 @@ var NoteSchema = db.Schema({
     body_html: String,
     body_text: String,
     update_at: { type: Date, default: Date.now, },
+});
+
+NoteSchema.pre('save', function(next){
+    console.log('running pre save');
+
+    this.body_html = sanitizeHtml(this.body_html);
+    this.body_text = htmlToText.fromString(this.body_html);
+    this.update_at = Date.now();
+    
+    next();
 });
 
 var Note = db.model('Note', NoteSchema);
@@ -26,7 +38,7 @@ app.use(function(req, res, next){
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
-    Note.find().sort({ update_at: 1})
+    Note.find().sort({ update_at: -1})
         .then(function(notes){
             res.json(notes);
             console.log('sending res');
