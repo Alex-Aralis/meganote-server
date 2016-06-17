@@ -1,5 +1,7 @@
+require('dotenv').load();
 var db = require('mongoose');
 
-db.connect('mongodb://localhost:27017/meganote');
+console.log(process.env.DB_URI);
+db.connect(process.env.DB_URI);
 
 module.exports = db;

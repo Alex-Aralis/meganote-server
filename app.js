@@ -1,8 +1,11 @@
-require('dotenv').load()
 var express = require('express');
 var bodyParser = require('body-parser');
 var db = require('./config/db');
 var app = express();
+
+var port = Number(process.argv[1]) || 8080;
+
+console.log(port);
 
 var NoteSchema = db.Schema({
     title: String,
@@ -15,13 +18,15 @@ var Note = db.model('Note', NoteSchema);
 
 app.use(function(req, res, next){
     res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
     next();
 });
 
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
-    Note.find()
+    Note.find().sort({ update_at: 1})
         .then(function(notes){
             res.json(notes);
             console.log('sending res');
@@ -29,11 +34,9 @@ app.get('/', function(req, res) {
 });
 
 app.get('/:id', function(req,res){
-
-    Note.find({_id: req.params.id})
-        .then(function(notes){
-            res.json(notes);
-    }); 
+    Note.findOne({_id: req.params.id}).then(function(note){
+        res.json(note);
+    });
 });
 
 app.post('/', function(req, res){
@@ -49,15 +52,21 @@ app.delete('/:id', function(req,res){
     res.json({msg:'note deleted', _id: req.params.id});
 });
 
-app.patch('/:id', function(req, res){
-    Note.update({_id: req.params.id}, req.body, {}, function(err){
-        res.json(err);
-    });
-});
+app.patch('/:id', update);
+app.put('/:id', update);
 
-app.listen(3030, function(){
-    console.log(process.env.DB_URI);
-    console.log('listening on port 3030');
+function update(req, res){
+    Note.update({_id: req.params.id}, req.body, {}, function(err){
+        if (!err){
+            res.json({msg: 'update successful', _id: req.params.id});
+        }else{
+            res.json(err);
+        }
+    });
+}
+
+app.listen(port, function(){
+    console.log('listening on port' + port);
 });
 
 
