@@ -58,21 +58,34 @@ app.post('/', function(req, res){
 }); 
 
 app.delete('/:id', function(req,res){
-    Note.find({_id: req.params.id})
-        .remove().exec();
-
-    res.json({msg:'note deleted', _id: req.params.id});
+    Note.findOne({_id: req.params.id})
+        .remove().exec(function(err, note){
+            if(err){
+                res.status(404).json(err);    
+            }else{
+                res.json({msg:'deletion successful', _id:req.params.id});
+            }
+        });
 });
 
 app.patch('/:id', update);
 app.put('/:id', update);
 
 function update(req, res){
-    Note.update({_id: req.params.id}, req.body, {}, function(err){
-        if (!err){
-            res.json({msg: 'update successful', _id: req.params.id});
+    Note.findOne({_id: req.params.id}, function(err, note){
+        if(err){
+            res.status(404).json(err);
         }else{
-            res.json(err);
+            if(req.body.title) note.title = req.body.title;
+            if(req.body.body_html) note.body_html = req.body.body_html;
+
+            note.save(function(err){
+                if(err){
+                    res.status(501).json(err);
+                }else{
+                    res.json({msg: 'update sucessful', _id: req.params.id});
+                }
+            });
         }
     });
 }
