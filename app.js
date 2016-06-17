@@ -38,7 +38,7 @@ app.use(function(req, res, next){
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
-    Note.find().sort().exec({ update_at: -1}, function(err, notes){
+    Note.find().sort({ update_at: -1}).exec(function(err, notes){
         if(err){
             res.status(500).json(err);
         }else{
