@@ -38,23 +38,37 @@ app.use(function(req, res, next){
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
-    Note.find().sort({ update_at: -1})
-        .then(function(notes){
+    Note.find().sort().exec({ update_at: -1}, function(err, notes){
+        if(err){
+            res.status(500).json(err);
+        }else{
             res.json(notes);
             console.log('sending res');
+        }
     });
 });
 
+
 app.get('/:id', function(req,res){
-    Note.findOne({_id: req.params.id}).then(function(note){
-        res.json(note);
+    Note.findOne({_id: req.params.id}, function(err, note){
+        if(err){
+            res.status(404).json(err);
+        }else{
+            res.json(note);
+        }
     });
 });
 
 app.post('/', function(req, res){
     var note = new Note(req.body);
-    res.json(note);
-    note.save();
+
+    note.save(function(err, note){
+        if(err){
+            res.status(404).json(err);
+        }else{
+            res.json({msg:'successful post', _id: note._id});
+        }
+    });
 }); 
 
 app.delete('/:id', function(req,res){
