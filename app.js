@@ -10,8 +10,8 @@ var port = Number(process.env.PORT) || 8080;
 console.log(port);
 
 var NoteSchema = db.Schema({
-    title: String,
-    body_html: String,
+    title: {type: String, required: true},
+    body_html: {type: String, required: true},
     body_text: String,
     update_at: { type: Date, default: Date.now, },
 });
